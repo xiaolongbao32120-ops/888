@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>หลงเปาหากำไรเฉลี่ย</title>
+<style>
+:root {
+  --bg-color: #f7f6f4;
+  --card-bg: #ffffff;
+  --primary: #443429;        /* น้ำตาลเข้มมินิมอล */
+  --secondary: #8c827b;      /* สีเทาอมน้ำตาล (Taupe) */
+  --border: #e2ded8;         /* เส้นขอบนุ่มๆ */
+  --accent: #a37c64;         /* น้ำตาลอ่อนอบอุ่น */
+  --danger: #b55d5d;         /* สีแดงหม่นสำหรับลบ/ส่วนลด */
+  --card-shadow: 0 4px 20px rgba(56, 50, 46, 0.04);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  background: var(--bg-color);
+  color: var(--primary);
+  padding: 24px 16px;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--card-bg);
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(226, 222, 216, 0.6);
+}
+
+h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--primary);
+}
+
+.header-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 36px;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--secondary);
+  margin-bottom: 8px;
+  padding-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  background: #ffffff;
+  color: var(--primary);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrapper.percent input {
+  padding-right: 24px;
+}
+
+.input-wrapper input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(163, 124, 100, 0.1);
+}
+
+.suffix {
+  position: absolute;
+  right: 10px;
+  color: var(--secondary);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.btn-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--secondary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: #faf8f6;
+  color: var(--danger);
+  border-color: #f0d5d5;
+}
+
+/* Coupon Section */
+.coupon-section {
+  margin-top: 16px;
+  background: #faf8f6;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.coupon-section label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.coupon-section select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  background: #ffffff;
+  color: var(--primary);
+  outline: none;
+  cursor: pointer;
+}
+
+.coupon-section select:focus {
+  border-color: var(--accent);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+button.main-btn {
+  flex: 1;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button.main-btn.secondary {
+  background: #efedeb;
+  color: var(--primary);
+}
+
+button.main-btn.outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+button.main-btn.outline:hover {
+  background: #faf8f6;
+}
+
+button.main-btn:hover {
+  opacity: 0.9;
+}
+
+/* Result Card */
+.result-card {
+  margin-top: 20px;
+  background: #faf8f6;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.result-header {
+  text-align: center;
+  font-size: 12px;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.result-value {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.net-profit-display {
+  text-align: center;
+  font-size: 12px;
+  color: var(--secondary);
+  margin-bottom: 16px;
+}
+
+.net-profit-display span {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.breakdown-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--secondary);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.breakdown-item:last-child {
+  margin-bottom: 0;
+}
+
+.breakdown-item .detail {
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+/* History Section */
+.history-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--border);
+}
+
+.history-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+.history-card {
+  background: #faf8f6;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+}
+
+.history-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--secondary);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr;
+  font-size: 11px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.history-table-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h3>คำนวณกำไรเฉลี่ย</h3>
+  
+  <div class="header-row">
+    <div>สินค้า</div>
+    <div>ยอดทั้งหมด</div>
+    <div>GP</div>
+    <div></div>
+  </div>
+
+  <div id="item-list">
+    <div class="row">
+      <div class="input-wrapper"><input type="text" placeholder="สินค้า 1" class="name" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" placeholder="0" class="value" oninput="calc()"></div>
+      <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
+      <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
+    </div>
+    <div class="row">
+      <div class="input-wrapper"><input type="text" placeholder="สินค้า 2" class="name" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" placeholder="0" class="value" oninput="calc()"></div>
+      <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
+      <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px;">
+    <button class="main-btn outline" onclick="addRow()">+ เพิ่มสินค้า</button>
+  </div>
+
+  <!-- กล่องเลือกคูปองส่วนลด -->
+  <div class="coupon-section">
+    <label>คูปองส่วนลด</label>
+    <select id="coupon-select" onchange="calc()">
+      <option value="0">ไม่ใช้คูปอง</option>
+      <option value="25">คูปอง 1,000 ลด 25 บาท</option>
+      <option value="55">คูปอง 2,000 ลด 55 บาท</option>
+      <option value="150">คูปอง 5,000 ลด 150 บาท</option>
+      <option value="320">คูปอง 9,000 ลด 320 บาท</option>
+      <option value="800">คูปอง 20,000 ลด 800 บาท</option>
+    </select>
+  </div>
+
+  <div class="actions">
+    <button class="main-btn secondary" onclick="clearAll()">เคลียร์ข้อมูล</button>
+    <button class="main-btn" onclick="saveHistory()">บันทึกข้อมูล</button>
+  </div>
+
+  <!-- ผลลัพธ์แสดงแบบ Real-time -->
+  <div class="result-card" id="result-section">
+    <div class="result-header">กำไรเฉลี่ยสุทธิ</div>
+    <div class="result-value" id="avg-result">0.00%</div>
+    <div class="net-profit-display">กำไรสุทธิ: <span id="net-profit-result">0.00</span> บาท</div>
+    
+    <div class="breakdown-title">รายละเอียดกำไรแต่ละรายการ</div>
+    <div id="breakdown-list" style="color: var(--secondary); font-size: 12px;">ยังไม่มีข้อมูลยอดขาย</div>
+  </div>
+
+  <div class="history-section" id="history-section" style="display: none;">
+    <div class="history-title">ประวัติการบันทึก</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<script>
+let lastCalculation = null;
+
+function addRow() {
+  const list = document.getElementById('item-list');
+  const count = list.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `
+    <div class="input-wrapper"><input type="text" placeholder="สินค้า ${count}" class="name" oninput="calc()"></div>
+    <div class="input-wrapper"><input type="number" placeholder="0" class="value" oninput="calc()"></div>
+    <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
+    <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
+  `;
+  list.appendChild(row);
+  calc();
+}
+
+function removeRow(button) {
+  const row = button.parentElement;
+  if (document.querySelectorAll('.row').length > 1) {
+    row.remove();
+    calc();
+  } else {
+    alert('ต้องมีรายการสินค้าอย่างน้อย 1 รายการครับ');
+  }
+}
+
+function clearAll() {
+  document.querySelectorAll('.row').forEach(row => {
+    row.querySelector('.name').value = '';
+    row.querySelector('.value').value = '';
+    row.querySelector('.profit').value = '';
+  });
+  document.getElementById('coupon-select').value = "0";
+  calc();
+}
+
+function calc() {
+  const rows = document.querySelectorAll('.row');
+  let totalVal = 0;
+  let totalProfVal = 0;
+  const breakdown = [];
+
+  rows.forEach((row, i) => {
+    const name = row.querySelector('.name').value.trim() || `สินค้า ${i + 1}`;
+    const val = parseFloat(row.querySelector('.value').value) || 0;
+    const profPct = parseFloat(row.querySelector('.profit').value) || 0;
+
+    if (val > 0) {
+      const profVal = val * (profPct / 100);
+      totalVal += val;
+      totalProfVal += profVal;
+      breakdown.push({ name, val, profPct, profVal });
+    }
+  });
+
+  const couponSelect = document.getElementById('coupon-select');
+  const discountAmount = parseFloat(couponSelect.value) || 0;
+  const couponText = couponSelect.options[couponSelect.selectedIndex].text;
+  
+  const netProfVal = totalProfVal - discountAmount;
+  const avgPct = totalVal > 0 ? (netProfVal / totalVal) * 100 : 0;
+  
+  // แสดงผลเปอร์เซ็นต์และกำไรสุทธิ
+  document.getElementById('avg-result').innerText = `${avgPct.toFixed(2)}%`;
+  document.getElementById('net-profit-result').innerText = netProfVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  
+  const bList = document.getElementById('breakdown-list');
+  bList.innerHTML = '';
+  
+  if (breakdown.length === 0 && totalVal === 0) {
+    bList.innerHTML = '<div style="color: var(--secondary); font-size: 12px;">ยังไม่มีข้อมูลยอดขาย</div>';
+  } else {
+    breakdown.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'breakdown-item';
+      div.innerHTML = `
+        <div><strong>${item.name}</strong> <span class="detail">(${item.profPct}%)</span></div>
+        <div>${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.</div>
+      `;
+      bList.appendChild(div);
+    });
+
+    if (discountAmount > 0) {
+      const discDiv = document.createElement('div');
+      discDiv.className = 'breakdown-item';
+      discDiv.style.color = 'var(--danger)';
+      discDiv.style.marginTop = '8px';
+      discDiv.style.paddingTop = '8px';
+      discDiv.style.borderTop = '1px dashed var(--border)';
+      discDiv.innerHTML = `
+        <div><strong>ส่วนลด (${couponText})</strong></div>
+        <div>-${discountAmount.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.</div>
+      `;
+      bList.appendChild(discDiv);
+    }
+  }
+
+  lastCalculation = {
+    avgPct: avgPct.toFixed(2),
+    totalVal,
+    totalProfVal,
+    discountAmount,
+    netProfVal,
+    couponText,
+    breakdown,
+    time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
+  };
+}
+
+function saveHistory() {
+  if (!lastCalculation || lastCalculation.totalVal === 0) {
+    alert('กรุณากรอกข้อมูลยอดขายก่อนบันทึกครับ');
+    return;
+  }
+
+  const hSection = document.getElementById('history-section');
+  const hList = document.getElementById('history-list');
+  hSection.style.display = 'block';
+
+  let itemsHtml = `
+    <div class="history-table-header">
+      <div>สินค้า</div>
+      <div style="text-align: right;">ยอดขาย</div>
+      <div style="text-align: right;">กำไร (GP)</div>
+    </div>
+  `;
+
+  lastCalculation.breakdown.forEach(item => {
+    itemsHtml += `
+      <div class="history-table-row">
+        <div style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</div>
+        <div style="text-align: right;">${item.val.toLocaleString('th-TH')}</div>
+        <div style="text-align: right;">
+          ${item.profPct}% <br>
+          <span style="color: var(--secondary); font-size: 10px;">(${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.)</span>
+        </div>
+      </div>
+    `;
+  });
+
+  let couponHtml = '';
+  if (lastCalculation.discountAmount > 0) {
+    couponHtml = `
+      <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--danger); margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border);">
+        <span>${lastCalculation.couponText}</span>
+        <span>-${lastCalculation.discountAmount.toLocaleString('th-TH')} บ.</span>
+      </div>
+    `;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'history-card';
+  card.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 8px;">
+      <span style="font-weight:600; font-size: 12px; color: var(--primary);">บันทึกเมื่อ: ${lastCalculation.time}</span>
+      <button class="btn-icon" style="width: 24px; height: 24px; font-size: 12px;" onclick="deleteHistory(this)" title="ลบประวัตินี้">✕</button>
+    </div>
+    
+    <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px;">
+      ${itemsHtml}
+      ${couponHtml}
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items: flex-end; font-size: 12px; border-top: 1px dashed var(--border); padding-top: 10px;">
+      <div style="color: var(--secondary); line-height: 1.5;">
+        <strong>ยอดรวม:</strong> ${lastCalculation.totalVal.toLocaleString()} บ.<br>
+        <strong>กำไรสุทธิ:</strong> ${lastCalculation.netProfVal.toLocaleString('th-TH', {maximumFractionDigits: 2})} บ.
+      </div>
+      <div style="text-align: right;">
+        <div style="color: var(--secondary); font-size: 11px; margin-bottom: 2px;">กำไรเฉลี่ย</div>
+        <div style="font-size: 16px; font-weight: 700; color: var(--primary);">
+          ${lastCalculation.avgPct}%
+        </div>
+      </div>
+    </div>
+  `;
+  
+  hList.prepend(card);
+}
+
+function deleteHistory(btn) {
+  const card = btn.closest('.history-card');
+  card.remove();
+  
+  const hList = document.getElementById('history-list');
+  if (hList.children.length === 0) {
+    document.getElementById('history-section').style.display = 'none';
+  }
+}
+</script>
+
+</body>
+</html>
