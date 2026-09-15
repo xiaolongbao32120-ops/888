@@ -10,11 +10,11 @@
 :root {
   --bg-color: #f7f6f4;
   --card-bg: #ffffff;
-  --primary: #443429;        /* น้ำตาลเข้มมินิมอล */
-  --secondary: #8c827b;      /* สีเทาอมน้ำตาล (Taupe) */
-  --border: #e2ded8;         /* เส้นขอบนุ่มๆ */
-  --accent: #a37c64;         /* น้ำตาลอ่อนอบอุ่น */
-  --danger: #b55d5d;         /* สีแดงหม่นสำหรับลบ/ส่วนลด */
+  --primary: #443429;        
+  --secondary: #8c827b;      
+  --border: #e2ded8;         
+  --accent: #a37c64;         
+  --danger: #b55d5d;         
   --card-shadow: 0 4px 20px rgba(56, 50, 46, 0.04);
 }
 
@@ -46,7 +46,6 @@ h3 {
   text-align: center;
 }
 
-/* ปรับ Grid สำหรับ 5 คอลัมน์ */
 .header-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1.5fr 1.2fr 34px;
@@ -131,7 +130,6 @@ h3 {
   border-color: #f0d5d5;
 }
 
-/* Coupon Section */
 .coupon-section {
   margin-top: 16px;
   background: #faf8f6;
@@ -166,7 +164,6 @@ h3 {
   border-color: var(--accent);
 }
 
-/* Actions */
 .actions {
   display: flex;
   gap: 8px;
@@ -207,7 +204,6 @@ button.main-btn:hover {
   opacity: 0.9;
 }
 
-/* Result Card */
 .result-card {
   margin-top: 20px;
   background: #faf8f6;
@@ -229,16 +225,17 @@ button.main-btn:hover {
   text-align: center;
   font-size: 32px;
   font-weight: 700;
-  margin-bottom: 2px;
+  margin-bottom: 8px;
   color: var(--primary);
   letter-spacing: -0.5px;
 }
 
 .net-profit-display {
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--secondary);
   margin-bottom: 16px;
+  line-height: 1.6;
 }
 
 .net-profit-display span {
@@ -272,7 +269,6 @@ button.main-btn:hover {
   font-size: 11px;
 }
 
-/* History Section */
 .history-section {
   margin-top: 24px;
   padding-top: 16px;
@@ -321,9 +317,7 @@ button.main-btn:hover {
   padding-bottom: 0;
 }
 
-/* -------------------------------------
-   เอฟเฟคสติกเกอร์เด้ง
-   ------------------------------------- */
+/* เอฟเฟคสติกเกอร์เด้ง */
 .sticker-popup {
   position: fixed;
   top: 50%;
@@ -331,7 +325,7 @@ button.main-btn:hover {
   transform: translate(-50%, -50%) scale(0);
   font-size: 100px;
   z-index: 9999;
-  pointer-events: none; /* เพื่อไม่ให้ไปบล็อกการคลิกของเว็บ */
+  pointer-events: none;
   filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
   animation: popSticker 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
@@ -390,7 +384,6 @@ button.main-btn:hover {
     <button class="main-btn outline" onclick="addRow()">+ เพิ่มสินค้า</button>
   </div>
 
-  <!-- กล่องเลือกคูปองส่วนลด -->
   <div class="coupon-section">
     <label>คูปองส่วนลด</label>
     <select id="coupon-select" onchange="calc()">
@@ -408,11 +401,14 @@ button.main-btn:hover {
     <button class="main-btn" onclick="saveHistory()">บันทึกข้อมูล</button>
   </div>
 
-  <!-- ผลลัพธ์แสดงแบบ Real-time -->
+  <!-- เพิ่มแสดงผล ยอดรวมสุทธิ ในหน้าจอ Real-time -->
   <div class="result-card" id="result-section">
     <div class="result-header">กำไรเฉลี่ยสุทธิ</div>
     <div class="result-value" id="avg-result">0.00%</div>
-    <div class="net-profit-display">กำไรสุทธิ: <span id="net-profit-result">0.00</span> บาท</div>
+    <div class="net-profit-display">
+      ยอดรวมสุทธิ: <span id="net-total-result">0.00</span> บาท<br>
+      กำไรสุทธิ: <span id="net-profit-result">0.00</span> บาท
+    </div>
     
     <div class="breakdown-title">รายละเอียดกำไรแต่ละรายการ</div>
     <div id="breakdown-list" style="color: var(--secondary); font-size: 12px;">ยังไม่มีข้อมูลยอดขาย</div>
@@ -476,7 +472,6 @@ function calc() {
     const price = parseFloat(row.querySelector('.price').value) || 0;
     const profPct = parseFloat(row.querySelector('.profit').value) || 0;
 
-    // ยอดขาย = จำนวนชิ้น * ราคาต่อชิ้น
     const val = qty * price;
 
     if (val > 0) {
@@ -491,11 +486,15 @@ function calc() {
   const discountAmount = parseFloat(couponSelect.value) || 0;
   const couponText = couponSelect.options[couponSelect.selectedIndex].text;
   
+  // ยอดรวมหลังหักส่วนลดคูปอง
+  const netTotalVal = Math.max(0, totalVal - discountAmount);
+  // กำไรสุทธิหลังหักส่วนลด
   const netProfVal = totalProfVal - discountAmount;
-  const avgPct = totalVal > 0 ? (netProfVal / totalVal) * 100 : 0;
+  // % กำไรเฉลี่ย = (กำไรสุทธิ / ยอดรวมสุทธิ)
+  const avgPct = netTotalVal > 0 ? (netProfVal / netTotalVal) * 100 : 0;
   
-  // แสดงผลเปอร์เซ็นต์และกำไรสุทธิ
   document.getElementById('avg-result').innerText = `${avgPct.toFixed(2)}%`;
+  document.getElementById('net-total-result').innerText = netTotalVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   document.getElementById('net-profit-result').innerText = netProfVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   
   const bList = document.getElementById('breakdown-list');
@@ -532,9 +531,11 @@ function calc() {
     }
   }
 
+  // เก็บค่าเข้า Object นำไปใช้ต่อตอนบันทึกประวัติ
   lastCalculation = {
     avgPct: avgPct.toFixed(2),
-    totalVal,
+    totalVal,          // ยอดรวมก่อนหักคูปอง
+    netTotalVal,       // ยอดรวมหลังหักคูปอง (เอาไปโชว์ในประวัติ)
     totalProfVal,
     discountAmount,
     netProfVal,
@@ -544,9 +545,8 @@ function calc() {
   };
 }
 
-// ฟังก์ชันสร้างสติกเกอร์เด้ง
 function showStickerEffect() {
-  const emojis = ['🎉', '💸', '✨', '💖', '👍', '🎊', '💰']; // ชุด Emoji ที่จะสุ่มออกมา
+  const emojis = ['🎉', '💸', '✨', '💖', '👍', '🎊', '💰'];
   const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
   const sticker = document.createElement('div');
@@ -555,7 +555,6 @@ function showStickerEffect() {
 
   document.body.appendChild(sticker);
 
-  // ให้สติกเกอร์หายไปเมื่อเล่นอนิเมชันจบ (1.2 วินาที)
   setTimeout(() => {
     sticker.remove();
   }, 1200);
@@ -619,7 +618,8 @@ function saveHistory() {
 
     <div style="display:flex; justify-content:space-between; align-items: flex-end; font-size: 12px; border-top: 1px dashed var(--border); padding-top: 10px;">
       <div style="color: var(--secondary); line-height: 1.5;">
-        <strong>ยอดรวม:</strong> ${lastCalculation.totalVal.toLocaleString()} บ.<br>
+        <!-- เปลี่ยนมาแสดงยอดรวมสุทธิ (หักคูปองแล้ว) -->
+        <strong>ยอดรวมสุทธิ:</strong> ${lastCalculation.netTotalVal.toLocaleString('th-TH', {maximumFractionDigits: 2})} บ.<br>
         <strong>กำไรสุทธิ:</strong> ${lastCalculation.netProfVal.toLocaleString('th-TH', {maximumFractionDigits: 2})} บ.
       </div>
       <div style="text-align: right;">
@@ -632,8 +632,6 @@ function saveHistory() {
   `;
   
   hList.prepend(card);
-
-  // เรียกใช้ฟังก์ชันสติกเกอร์เด้งเมื่อบันทึกข้อมูลลงประวัติสำเร็จ
   showStickerEffect();
 }
 
