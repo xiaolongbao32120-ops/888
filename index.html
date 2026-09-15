@@ -481,7 +481,6 @@ function calc() {
     }
   });
 
-  // คำนวณสัดส่วน % ของยอดขายแต่ละตัวเทียบกับยอดรวม (100%)
   const breakdown = rawItems.map(item => {
     const sharePct = totalVal > 0 ? (item.val / totalVal) * 100 : 0;
     return { ...item, sharePct };
@@ -493,7 +492,9 @@ function calc() {
   
   const netTotalVal = Math.max(0, totalVal - discountAmount);
   const netProfVal = totalProfVal - discountAmount;
-  const avgPct = netTotalVal > 0 ? (netProfVal / netTotalVal) * 100 : 0;
+
+  // ปรับสูตร % กำไรเฉลี่ยสุทธิ เทียบสัดส่วนจากยอดขายเต็ม (totalVal) ให้ตรงกับรูปแบบ GP
+  const avgPct = totalVal > 0 ? (netProfVal / totalVal) * 100 : 0;
   
   document.getElementById('avg-result').innerText = `${avgPct.toFixed(2)}%`;
   document.getElementById('net-total-result').innerText = netTotalVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
