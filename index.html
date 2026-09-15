@@ -295,7 +295,6 @@ button.main-btn:hover {
   border: 1px solid var(--border);
 }
 
-/* ปรับ Grid History เป็น 4 คอลัมน์ */
 .history-table-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
@@ -320,6 +319,40 @@ button.main-btn:hover {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
+}
+
+/* -------------------------------------
+   เอฟเฟคสติกเกอร์เด้ง
+   ------------------------------------- */
+.sticker-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 100px;
+  z-index: 9999;
+  pointer-events: none; /* เพื่อไม่ให้ไปบล็อกการคลิกของเว็บ */
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+  animation: popSticker 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popSticker {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(10deg);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -80%) scale(0.8);
+    opacity: 0;
+  }
 }
 </style>
 </head>
@@ -511,6 +544,23 @@ function calc() {
   };
 }
 
+// ฟังก์ชันสร้างสติกเกอร์เด้ง
+function showStickerEffect() {
+  const emojis = ['🎉', '💸', '✨', '💖', '👍', '🎊', '💰']; // ชุด Emoji ที่จะสุ่มออกมา
+  const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+  const sticker = document.createElement('div');
+  sticker.className = 'sticker-popup';
+  sticker.innerText = randomEmoji;
+
+  document.body.appendChild(sticker);
+
+  // ให้สติกเกอร์หายไปเมื่อเล่นอนิเมชันจบ (1.2 วินาที)
+  setTimeout(() => {
+    sticker.remove();
+  }, 1200);
+}
+
 function saveHistory() {
   if (!lastCalculation || lastCalculation.totalVal === 0) {
     alert('กรุณากรอกข้อมูลจำนวนและราคาสินค้าก่อนบันทึกครับ');
@@ -582,6 +632,9 @@ function saveHistory() {
   `;
   
   hList.prepend(card);
+
+  // เรียกใช้ฟังก์ชันสติกเกอร์เด้งเมื่อบันทึกข้อมูลลงประวัติสำเร็จ
+  showStickerEffect();
 }
 
 function deleteHistory(btn) {
