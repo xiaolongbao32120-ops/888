@@ -45,15 +45,16 @@ h3 {
   color: var(--primary);
 }
 
+/* ปรับ Grid สำหรับ 5 คอลัมน์ */
 .header-row {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr 36px;
-  gap: 8px;
+  grid-template-columns: 2fr 1fr 1.5fr 1.2fr 34px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 500;
   color: var(--secondary);
   margin-bottom: 8px;
-  padding-left: 4px;
+  padding-left: 2px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -66,8 +67,8 @@ h3 {
 
 .row {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr 36px;
-  gap: 8px;
+  grid-template-columns: 2fr 1fr 1.5fr 1.2fr 34px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -79,10 +80,10 @@ h3 {
 
 .input-wrapper input {
   width: 100%;
-  padding: 9px 12px;
+  padding: 9px 8px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   background: #ffffff;
   color: var(--primary);
   outline: none;
@@ -91,7 +92,7 @@ h3 {
 }
 
 .input-wrapper.percent input {
-  padding-right: 24px;
+  padding-right: 20px;
 }
 
 .input-wrapper input:focus {
@@ -101,7 +102,7 @@ h3 {
 
 .suffix {
   position: absolute;
-  right: 10px;
+  right: 6px;
   color: var(--secondary);
   font-size: 12px;
   pointer-events: none;
@@ -293,9 +294,10 @@ button.main-btn:hover {
   border: 1px solid var(--border);
 }
 
+/* ปรับ Grid History เป็น 4 คอลัมน์ */
 .history-table-header {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
   font-weight: 600;
   font-size: 11px;
   color: var(--secondary);
@@ -306,7 +308,7 @@ button.main-btn:hover {
 
 .history-table-row {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
   font-size: 11px;
   margin-bottom: 6px;
   padding-bottom: 6px;
@@ -327,7 +329,8 @@ button.main-btn:hover {
   
   <div class="header-row">
     <div>สินค้า</div>
-    <div>ยอดขาย</div>
+    <div style="text-align: center;">ชิ้น</div>
+    <div>ราคา/ชิ้น</div>
     <div>GP</div>
     <div></div>
   </div>
@@ -335,13 +338,15 @@ button.main-btn:hover {
   <div id="item-list">
     <div class="row">
       <div class="input-wrapper"><input type="text" placeholder="สินค้า 1" class="name" oninput="calc()"></div>
-      <div class="input-wrapper"><input type="number" placeholder="0" class="value" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" placeholder="0" class="qty" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" placeholder="0" class="price" oninput="calc()"></div>
       <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
       <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
     </div>
     <div class="row">
       <div class="input-wrapper"><input type="text" placeholder="สินค้า 2" class="name" oninput="calc()"></div>
-      <div class="input-wrapper"><input type="number" placeholder="0" class="value" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" placeholder="0" class="qty" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" placeholder="0" class="price" oninput="calc()"></div>
       <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
       <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
     </div>
@@ -395,7 +400,8 @@ function addRow() {
   row.className = 'row';
   row.innerHTML = `
     <div class="input-wrapper"><input type="text" placeholder="สินค้า ${count}" class="name" oninput="calc()"></div>
-    <div class="input-wrapper"><input type="number" placeholder="0" class="value" oninput="calc()"></div>
+    <div class="input-wrapper"><input type="number" placeholder="0" class="qty" oninput="calc()"></div>
+    <div class="input-wrapper"><input type="number" placeholder="0" class="price" oninput="calc()"></div>
     <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
     <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
   `;
@@ -416,7 +422,8 @@ function removeRow(button) {
 function clearAll() {
   document.querySelectorAll('.row').forEach(row => {
     row.querySelector('.name').value = '';
-    row.querySelector('.value').value = '';
+    row.querySelector('.qty').value = '';
+    row.querySelector('.price').value = '';
     row.querySelector('.profit').value = '';
   });
   document.getElementById('coupon-select').value = "0";
@@ -431,14 +438,18 @@ function calc() {
 
   rows.forEach((row, i) => {
     const name = row.querySelector('.name').value.trim() || `สินค้า ${i + 1}`;
-    const val = parseFloat(row.querySelector('.value').value) || 0;
+    const qty = parseFloat(row.querySelector('.qty').value) || 0;
+    const price = parseFloat(row.querySelector('.price').value) || 0;
     const profPct = parseFloat(row.querySelector('.profit').value) || 0;
+
+    // ยอดขาย = จำนวนชิ้น * ราคาต่อชิ้น
+    const val = qty * price;
 
     if (val > 0) {
       const profVal = val * (profPct / 100);
       totalVal += val;
       totalProfVal += profVal;
-      breakdown.push({ name, val, profPct, profVal });
+      breakdown.push({ name, qty, price, val, profPct, profVal });
     }
   });
 
@@ -463,7 +474,10 @@ function calc() {
       const div = document.createElement('div');
       div.className = 'breakdown-item';
       div.innerHTML = `
-        <div><strong>${item.name}</strong> <span class="detail">(${item.profPct}%)</span></div>
+        <div>
+          <strong>${item.name}</strong> 
+          <span class="detail">(${item.qty} ชิ้น x ${item.price.toLocaleString('th-TH')} บ. | GP ${item.profPct}%)</span>
+        </div>
         <div>${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.</div>
       `;
       bList.appendChild(div);
@@ -498,7 +512,7 @@ function calc() {
 
 function saveHistory() {
   if (!lastCalculation || lastCalculation.totalVal === 0) {
-    alert('กรุณากรอกข้อมูลยอดขายก่อนบันทึกครับ');
+    alert('กรุณากรอกข้อมูลจำนวนและราคาสินค้าก่อนบันทึกครับ');
     return;
   }
 
@@ -509,6 +523,7 @@ function saveHistory() {
   let itemsHtml = `
     <div class="history-table-header">
       <div>สินค้า</div>
+      <div style="text-align: center;">จำนวน</div>
       <div style="text-align: right;">ยอดขาย</div>
       <div style="text-align: right;">กำไร (GP)</div>
     </div>
@@ -518,6 +533,7 @@ function saveHistory() {
     itemsHtml += `
       <div class="history-table-row">
         <div style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</div>
+        <div style="text-align: center;">${item.qty}</div>
         <div style="text-align: right;">${item.val.toLocaleString('th-TH')}</div>
         <div style="text-align: right;">
           ${item.profPct}% <br>
