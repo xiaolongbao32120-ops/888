@@ -401,7 +401,6 @@ button.main-btn:hover {
     <button class="main-btn" onclick="saveHistory()">บันทึกข้อมูล</button>
   </div>
 
-  <!-- เพิ่มแสดงผล ยอดรวมสุทธิ ในหน้าจอ Real-time -->
   <div class="result-card" id="result-section">
     <div class="result-header">กำไรเฉลี่ยสุทธิ</div>
     <div class="result-value" id="avg-result">0.00%</div>
@@ -464,7 +463,7 @@ function calc() {
   const rows = document.querySelectorAll('.row');
   let totalVal = 0;
   let totalProfVal = 0;
-  const breakdown = [];
+  const rawItems = [];
 
   rows.forEach((row, i) => {
     const name = row.querySelector('.name').value.trim() || `สินค้า ${i + 1}`;
@@ -478,19 +477,22 @@ function calc() {
       const profVal = val * (profPct / 100);
       totalVal += val;
       totalProfVal += profVal;
-      breakdown.push({ name, qty, price, val, profPct, profVal });
+      rawItems.push({ name, qty, price, val, profPct, profVal });
     }
+  });
+
+  // คำนวณสัดส่วน % ของยอดขายแต่ละตัวเทียบกับยอดรวม (100%)
+  const breakdown = rawItems.map(item => {
+    const sharePct = totalVal > 0 ? (item.val / totalVal) * 100 : 0;
+    return { ...item, sharePct };
   });
 
   const couponSelect = document.getElementById('coupon-select');
   const discountAmount = parseFloat(couponSelect.value) || 0;
   const couponText = couponSelect.options[couponSelect.selectedIndex].text;
   
-  // ยอดรวมหลังหักส่วนลดคูปอง
   const netTotalVal = Math.max(0, totalVal - discountAmount);
-  // กำไรสุทธิหลังหักส่วนลด
   const netProfVal = totalProfVal - discountAmount;
-  // % กำไรเฉลี่ย = (กำไรสุทธิ / ยอดรวมสุทธิ)
   const avgPct = netTotalVal > 0 ? (netProfVal / netTotalVal) * 100 : 0;
   
   document.getElementById('avg-result').innerText = `${avgPct.toFixed(2)}%`;
@@ -508,10 +510,10 @@ function calc() {
       div.className = 'breakdown-item';
       div.innerHTML = `
         <div>
-          <strong>${item.name}</strong> 
-          <span class="detail">(${item.qty} ชิ้น x ${item.price.toLocaleString('th-TH')} บ. | GP ${item.profPct}%)</span>
+          <strong>${item.name}</strong> <span style="color: var(--accent); font-weight: 600;">(${item.sharePct.toFixed(1)}%)</span>
+          <br><span class="detail">${item.qty} ชิ้น x ${item.price.toLocaleString('th-TH')} บ. | GP ${item.profPct}%</span>
         </div>
-        <div>${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.</div>
+        <div style="text-align: right;">${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.</div>
       `;
       bList.appendChild(div);
     });
@@ -531,11 +533,10 @@ function calc() {
     }
   }
 
-  // เก็บค่าเข้า Object นำไปใช้ต่อตอนบันทึกประวัติ
   lastCalculation = {
     avgPct: avgPct.toFixed(2),
-    totalVal,          // ยอดรวมก่อนหักคูปอง
-    netTotalVal,       // ยอดรวมหลังหักคูปอง (เอาไปโชว์ในประวัติ)
+    totalVal,
+    netTotalVal,
     totalProfVal,
     discountAmount,
     netProfVal,
@@ -572,7 +573,7 @@ function saveHistory() {
 
   let itemsHtml = `
     <div class="history-table-header">
-      <div>สินค้า</div>
+      <div>สินค้า (สัดส่วน)</div>
       <div style="text-align: center;">จำนวน</div>
       <div style="text-align: right;">ยอดขาย</div>
       <div style="text-align: right;">กำไร (GP)</div>
@@ -582,7 +583,10 @@ function saveHistory() {
   lastCalculation.breakdown.forEach(item => {
     itemsHtml += `
       <div class="history-table-row">
-        <div style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</div>
+        <div>
+          <div style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</div>
+          <span style="color: var(--accent); font-size: 10px; font-weight: 600;">สัดส่วน ${item.sharePct.toFixed(1)}%</span>
+        </div>
         <div style="text-align: center;">${item.qty}</div>
         <div style="text-align: right;">${item.val.toLocaleString('th-TH')}</div>
         <div style="text-align: right;">
@@ -618,7 +622,6 @@ function saveHistory() {
 
     <div style="display:flex; justify-content:space-between; align-items: flex-end; font-size: 12px; border-top: 1px dashed var(--border); padding-top: 10px;">
       <div style="color: var(--secondary); line-height: 1.5;">
-        <!-- เปลี่ยนมาแสดงยอดรวมสุทธิ (หักคูปองแล้ว) -->
         <strong>ยอดรวมสุทธิ:</strong> ${lastCalculation.netTotalVal.toLocaleString('th-TH', {maximumFractionDigits: 2})} บ.<br>
         <strong>กำไรสุทธิ:</strong> ${lastCalculation.netProfVal.toLocaleString('th-TH', {maximumFractionDigits: 2})} บ.
       </div>
