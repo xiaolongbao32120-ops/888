@@ -366,15 +366,15 @@ button.main-btn:hover {
   <div id="item-list">
     <div class="row">
       <div class="input-wrapper"><input type="text" placeholder="สินค้า 1" class="name" oninput="calc()"></div>
-      <div class="input-wrapper"><input type="number" placeholder="0" class="qty" oninput="calc()"></div>
-      <div class="input-wrapper"><input type="number" placeholder="0" class="price" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" min="0" placeholder="0" class="qty" oninput="if(this.value<0)this.value=0; calc()"></div>
+      <div class="input-wrapper"><input type="number" min="0" placeholder="0" class="price" oninput="if(this.value<0)this.value=0; calc()"></div>
       <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
       <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
     </div>
     <div class="row">
       <div class="input-wrapper"><input type="text" placeholder="สินค้า 2" class="name" oninput="calc()"></div>
-      <div class="input-wrapper"><input type="number" placeholder="0" class="qty" oninput="calc()"></div>
-      <div class="input-wrapper"><input type="number" placeholder="0" class="price" oninput="calc()"></div>
+      <div class="input-wrapper"><input type="number" min="0" placeholder="0" class="qty" oninput="if(this.value<0)this.value=0; calc()"></div>
+      <div class="input-wrapper"><input type="number" min="0" placeholder="0" class="price" oninput="if(this.value<0)this.value=0; calc()"></div>
       <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
       <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
     </div>
@@ -429,8 +429,8 @@ function addRow() {
   row.className = 'row';
   row.innerHTML = `
     <div class="input-wrapper"><input type="text" placeholder="สินค้า ${count}" class="name" oninput="calc()"></div>
-    <div class="input-wrapper"><input type="number" placeholder="0" class="qty" oninput="calc()"></div>
-    <div class="input-wrapper"><input type="number" placeholder="0" class="price" oninput="calc()"></div>
+    <div class="input-wrapper"><input type="number" min="0" placeholder="0" class="qty" oninput="if(this.value<0)this.value=0; calc()"></div>
+    <div class="input-wrapper"><input type="number" min="0" placeholder="0" class="price" oninput="if(this.value<0)this.value=0; calc()"></div>
     <div class="input-wrapper percent"><input type="number" placeholder="0" class="profit" oninput="calc()"><span class="suffix">%</span></div>
     <button class="btn-icon" onclick="removeRow(this)" title="ลบแถว">−</button>
   `;
@@ -467,8 +467,8 @@ function calc() {
 
   rows.forEach((row, i) => {
     const name = row.querySelector('.name').value.trim() || `สินค้า ${i + 1}`;
-    const qty = parseFloat(row.querySelector('.qty').value) || 0;
-    const price = parseFloat(row.querySelector('.price').value) || 0;
+    const qty = Math.max(0, parseFloat(row.querySelector('.qty').value) || 0);
+    const price = Math.max(0, parseFloat(row.querySelector('.price').value) || 0);
     const profPct = parseFloat(row.querySelector('.profit').value) || 0;
 
     const val = qty * price;
@@ -492,8 +492,6 @@ function calc() {
   
   const netTotalVal = Math.max(0, totalVal - discountAmount);
   const netProfVal = totalProfVal - discountAmount;
-
-  // ปรับสูตร % กำไรเฉลี่ยสุทธิ เทียบสัดส่วนจากยอดขายเต็ม (totalVal) ให้ตรงกับรูปแบบ GP
   const avgPct = totalVal > 0 ? (netProfVal / totalVal) * 100 : 0;
   
   document.getElementById('avg-result').innerText = `${avgPct.toFixed(2)}%`;
