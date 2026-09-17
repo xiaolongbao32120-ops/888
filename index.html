@@ -13,7 +13,7 @@
   --primary: #443429;        
   --secondary: #8c827b;      
   --border: #e2ded8;         
-  --accent: #a37c64;         
+  --accent: #b0120a;         
   --danger: #b55d5d;         
   --card-shadow: 0 4px 20px rgba(56, 50, 46, 0.04);
 }
@@ -291,9 +291,10 @@ button.main-btn:hover {
   border: 1px solid var(--border);
 }
 
+/* ปรับปรุงโครงสร้างตารางประวัติให้รองรับการแสดง จำนวน x ราคา = ยอดขาย */
 .history-table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
+  grid-template-columns: 2fr 2.2fr 1.5fr;
   font-weight: 600;
   font-size: 11px;
   color: var(--secondary);
@@ -304,7 +305,7 @@ button.main-btn:hover {
 
 .history-table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
+  grid-template-columns: 2fr 2.2fr 1.5fr;
   font-size: 11px;
   margin-bottom: 6px;
   padding-bottom: 6px;
@@ -570,15 +571,16 @@ function saveHistory() {
   const hList = document.getElementById('history-list');
   hSection.style.display = 'block';
 
+  // ปรับส่วนหัวให้แสดง 3 คอลัมน์
   let itemsHtml = `
     <div class="history-table-header">
       <div>สินค้า (สัดส่วน)</div>
-      <div style="text-align: center;">จำนวน</div>
-      <div style="text-align: right;">ยอดขาย</div>
+      <div style="text-align: right;">จำนวน × ราคา = ยอดขาย</div>
       <div style="text-align: right;">กำไร (GP)</div>
     </div>
   `;
 
+  // ปรับเนื้อหาแถวประวัติการบันทึก
   lastCalculation.breakdown.forEach(item => {
     itemsHtml += `
       <div class="history-table-row">
@@ -586,9 +588,11 @@ function saveHistory() {
           <div style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</div>
           <span style="color: var(--accent); font-size: 10px; font-weight: 600;">สัดส่วน ${item.sharePct.toFixed(1)}%</span>
         </div>
-        <div style="text-align: center;">${item.qty}</div>
-        <div style="text-align: right;">${item.val.toLocaleString('th-TH')}</div>
-        <div style="text-align: right;">
+        <div style="text-align: right; line-height: 1.4;">
+          <span style="color: var(--secondary); font-size: 10px;">${item.qty} ชิ้น × ${item.price.toLocaleString('th-TH')} บ.</span><br>
+          <span style="font-weight: 500;">= ${item.val.toLocaleString('th-TH')}</span>
+        </div>
+        <div style="text-align: right; line-height: 1.4;">
           ${item.profPct}% <br>
           <span style="color: var(--secondary); font-size: 10px;">(${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.)</span>
         </div>
