@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หลงเปามิกซ์ Mix Margin</title>
     
+    <!-- เชื่อมต่อ Manifest.json สำหรับ PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#a61b29">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
     <!-- Load Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,7 +287,6 @@
             `;
             list.appendChild(row);
             
-            // Trigger animation
             requestAnimationFrame(() => {
                 row.classList.remove('opacity-0', '-translate-y-2');
             });
@@ -350,11 +354,9 @@
             const netProfVal = totalProfVal - discountAmount;
             const avgPct = totalVal > 0 ? (netProfVal / totalVal) * 100 : 0;
             
-            // Update UI elements
             const avgElement = document.getElementById('avg-result');
             avgElement.innerText = `${avgPct.toFixed(2)}%`;
             
-            // Change color based on profit/loss
             if(avgPct < 0) {
                 avgElement.className = "text-center text-4xl font-extrabold mb-3 text-red-600 drop-shadow-sm";
             } else {
@@ -475,10 +477,8 @@
             }
 
             const card = document.createElement('div');
-            // Styled like a beautiful Chinese receipt
             card.className = 'bg-[#fef9eb] p-4 rounded-xl border border-china-gold shadow-sm text-xs relative overflow-hidden transition-all hover:shadow-md';
             
-            // Decorative subtle background pattern for receipt
             card.innerHTML = `
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-china-gold"></div>
                 <div class="flex justify-between items-center mb-3">
@@ -526,7 +526,15 @@
             }, 200);
         }
 
-        // Initialize calculation on load just in case
+        // ลงทะเบียน Service Worker เบื้องต้นสำหรับ PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {
+                    // ป้องกัน Error กรณีไม่ได้สร้างไฟล์ sw.js ไว้ (สามารถปล่อยผ่านได้)
+                });
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             calc();
         });
