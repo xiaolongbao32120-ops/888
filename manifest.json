@@ -2,10 +2,15 @@
   "short_name": "หลงเปามิกซ์",
   "name": "หลงเปา",
   "icons": [
-    {
+   {
       "src": "S__13459486.jpg",
       "type": "image/png",
       "sizes": "192x192"
+    },
+    {
+      "src": "mon8888.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "start_url": "index.html",
@@ -13,3 +18,4 @@
   "display": "standalone",
   "theme-color": "#dbe2e6"
 }
+
