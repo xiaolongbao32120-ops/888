@@ -3,14 +3,9 @@
   "name": "หลงเปา",
   "icons": [
     {
-      "src": "S_13459486.jpg",
+      "src": "8888.jpg",
       "type": "image/png",
       "sizes": "192x192"
-    },
-    {
-      "src": "mon8888.png",
-      "type": "image/png",
-      "sizes": "512x512"
     }
   ],
   "start_url": "index.html",
