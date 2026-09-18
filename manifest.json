@@ -2,9 +2,9 @@
   "short_name": "หลงเปามิกซ์",
   "name": "หลงเปา",
   "icons": [
-   {
-      "src": "S__13459486.jpg",
-      "type": "image/png",
+    {
+      "src": "8888.jpg",
+      "type": "image/jpeg",
       "sizes": "192x192"
     },
     {
@@ -14,8 +14,7 @@
     }
   ],
   "start_url": "index.html",
-  "background_color": "#dbe2e6",
   "display": "standalone",
-  "theme-color": "#dbe2e6"
+  "background_color": "#dbe2e6",
+  "theme_color": "#dbe2e6"
 }
-
