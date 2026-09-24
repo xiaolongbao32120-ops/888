@@ -3,29 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หลงเปามิกซ์ Mix Margin</title>
+    <title>หลงเปา - ระบบคำนวณต้นทุน & Mix Margin</title>
     
-    <!-- เชื่อมต่อ Manifest.json สำหรับ PWA -->
-    <!-- เชื่อมต่อ Manifest.json สำหรับ PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#dbe2e6">
-
-<!-- ไอคอนสำหรับมือถือทั่วไปและ Android -->
-<link rel="icon" type="image/png" sizes="192x192" href="8888.jpg">
-
-<!-- ไอคอนสำหรับ Apple / iOS (Add to Home Screen) -->
-<link rel="apple-touch-icon" href="8888.jpg">
+    <!-- PWA & Favicon -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#7a1218">
+    <link rel="icon" type="image/png" sizes="192x192" href="8888.jpg">
+    <link rel="apple-touch-icon" href="8888.jpg">
     
-    <!-- Load Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Load Tailwind CSS -->
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -51,7 +48,6 @@
     </script>
     
     <style>
-        /* Custom Layout for Grid to keep HTML clean */
         .item-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1.5fr 1.2fr 34px;
@@ -59,51 +55,10 @@
             align-items: center;
         }
 
-        /* Custom Scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #fdf1cd; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d4af37; 
-            border-radius: 4px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #fdf1cd; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 4px; }
 
-        /* Sticker Popup Animation */
-        .sticker-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 100px;
-            z-index: 9999;
-            pointer-events: none;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
-            animation: popSticker 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes popSticker {
-            0% {
-                transform: translate(-50%, -50%) scale(0) rotate(-20deg);
-                opacity: 0;
-            }
-            40% {
-                transform: translate(-50%, -50%) scale(1.2) rotate(10deg);
-                opacity: 1;
-            }
-            60% {
-                transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -80%) scale(0.8);
-                opacity: 0;
-            }
-        }
-
-        /* Toast Animation */
         @keyframes slideInDown {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -117,147 +72,243 @@
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-china-darkred to-china-red min-h-screen py-8 px-4 text-china-dark antialiased">
+<body class="bg-gradient-to-br from-china-darkred to-china-red min-h-screen py-6 px-3 sm:px-4 text-china-dark antialiased dark:from-gray-900 dark:to-china-dark transition-colors duration-300">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4"></div>
 
-    <div class="max-w-[480px] mx-auto bg-china-cream p-5 sm:p-7 rounded-2xl shadow-2xl border border-china-gold/40 relative overflow-hidden">
+    <div class="max-w-[520px] mx-auto">
         
-        <!-- Decorative corner accents -->
-        <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-china-gold rounded-tl-xl opacity-30 pointer-events-none"></div>
-        <div class="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-china-gold rounded-tr-xl opacity-30 pointer-events-none"></div>
-
-        <!-- Header -->
-        <h3 class="text-xl sm:text-2xl font-bold text-center text-china-red mb-6 flex items-center justify-center gap-2 tracking-wide">
-            <span>福</span> หลงเปา Mix Margin <span> 禄</span>
-        </h3>
-        
-        <!-- Header Row -->
-        <div class="item-grid text-[11px] font-semibold text-china-red/80 mb-2 px-1 uppercase tracking-wider">
-            <div>สินค้า</div>
-            <div class="text-center">ชิ้น</div>
-            <div>ราคา/ชิ้น</div>
-            <div>GP</div>
-            <div></div>
-        </div>
-
-        <!-- Item List Container -->
-        <div id="item-list" class="flex flex-col gap-2 relative z-10">
-            <!-- Row 1 -->
-            <div class="item-grid row">
-                <div class="relative flex items-center">
-                    <input type="text" placeholder="สินค้า 1" class="name w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="qty w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="if(this.value<0)this.value=0; calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="price w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="if(this.value<0)this.value=0; calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" placeholder="0" class="profit w-full pl-2 pr-5 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="calc()">
-                    <span class="absolute right-2 text-china-gray text-[10px] pointer-events-none">%</span>
-                </div>
-                <button class="w-[34px] h-[34px] flex items-center justify-center bg-transparent border border-china-gold/40 rounded-lg text-china-gray hover:bg-red-50 hover:text-china-red hover:border-china-red transition-all" onclick="removeRow(this)" title="ลบแถว">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
-                </button>
-            </div>
-            
-            <!-- Row 2 -->
-            <div class="item-grid row">
-                <div class="relative flex items-center">
-                    <input type="text" placeholder="สินค้า 2" class="name w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="qty w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="if(this.value<0)this.value=0; calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="price w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="if(this.value<0)this.value=0; calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" placeholder="0" class="profit w-full pl-2 pr-5 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="calc()">
-                    <span class="absolute right-2 text-china-gray text-[10px] pointer-events-none">%</span>
-                </div>
-                <button class="w-[34px] h-[34px] flex items-center justify-center bg-transparent border border-china-gold/40 rounded-lg text-china-gray hover:bg-red-50 hover:text-china-red hover:border-china-red transition-all" onclick="removeRow(this)" title="ลบแถว">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="mt-3 relative z-10">
-            <button class="w-full sm:w-auto px-4 py-2 bg-transparent border border-china-gold text-china-red font-medium rounded-lg text-xs hover:bg-china-lightgold transition-colors flex items-center justify-center gap-1 mx-auto" onclick="addRow()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                เพิ่มสินค้า
+        <!-- App Switcher Navigation -->
+        <div class="mb-4 bg-china-cream/90 dark:bg-gray-800/90 p-1.5 rounded-2xl shadow-lg border border-china-gold/40 flex items-center justify-between gap-1 backdrop-blur-sm">
+            <button id="nav-app1" onclick="switchApp('app1')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 bg-gradient-to-r from-china-darkred to-china-red text-white shadow-md">
+                📊 คำนวณหา GP
+            </button>
+            <button id="nav-app2" onclick="switchApp('app2')" class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 text-china-dark dark:text-china-lightgold hover:bg-china-lightgold/50">
+                🧮 Mix Margin
+            </button>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-china-gold/40 text-china-dark dark:text-china-gold hover:bg-china-lightgold/30 transition-all" title="สลับโหมดมืด/สว่าง">
+                🌙
             </button>
         </div>
 
-        <div class="mt-5 bg-china-lightgold/50 p-4 border border-china-gold/40 rounded-xl relative z-10">
-            <label class="block text-xs font-semibold text-china-red mb-2 uppercase tracking-wide">คูปองส่วนลด</label>
-            <select id="coupon-select" class="w-full px-3 py-2.5 border border-china-gold/50 rounded-lg text-sm bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red cursor-pointer shadow-sm transition-all" onchange="calc()">
-                <option value="0">ไม่ใช้คูปอง</option>
-                <option value="25">คูปอง 1,000 ลด 25 บาท</option>
-                <option value="55">คูปอง 2,000 ลด 55 บาท</option>
-                <option value="150">คูปอง 5,000 ลด 150 บาท</option>
-                <option value="320">คูปอง 9,000 ลด 320 บาท</option>
-                <option value="800">คูปอง 20,000 ลด 800 บาท</option>
-            </select>
+        <!-- APP 1: คำนวณต้นทุน และ ทุน A1 -->
+        <div id="app1-section" class="bg-china-cream dark:bg-gray-800 p-5 sm:p-7 rounded-2xl shadow-2xl border border-china-gold/40 relative overflow-hidden transition-all">
+            <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-china-gold rounded-tl-xl opacity-30 pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-china-gold rounded-tr-xl opacity-30 pointer-events-none"></div>
+
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-lg sm:text-xl font-bold text-china-red dark:text-china-gold flex items-center gap-2">
+                    หลงเปาพาคำนวณ
+                </h2>
+            </div>
+
+            <!-- Form 1: Calculate Cost & A1 -->
+            <div class="space-y-3 bg-white dark:bg-gray-700/50 p-4 rounded-xl border border-china-gold/30">
+                <h3 class="text-xs font-bold text-china-red dark:text-china-gold uppercase tracking-wider">1. คำนวณต้นทุน และ ทุน A1</h3>
+                <div>
+                    <label class="block text-xs font-medium dark:text-gray-200 mb-1">ชื่อสินค้า</label>
+                    <input type="text" id="app1-name" placeholder="ชื่อสินค้าที่อยากคำนวณ" oninput="calcApp1()" class="w-full px-3 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:border-china-red">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium dark:text-gray-200 mb-1">ราคาประกาศ (บาท)</label>
+                        <input type="number" id="app1-declared-price" placeholder="0.00" oninput="if(this.value<0)this.value=0; calcApp1()" class="w-full px-3 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:border-china-red">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium dark:text-gray-200 mb-1">% GP</label>
+                        <input type="number" id="app1-gp-pct" placeholder="0" oninput="calcApp1()" class="w-full px-3 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:border-china-red">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-dashed border-china-gold/30 text-xs">
+                    <div class="bg-china-cream dark:bg-gray-800 p-2 rounded-lg border border-china-gold/20">
+                        <span class="text-china-gray dark:text-gray-400 block text-[10px]">ต้นทุน + Vat 7%</span>
+                        <strong id="app1-cost-vat" class="text-china-dark dark:text-white text-sm">0.00</strong> บาท
+                    </div>
+                    <div class="bg-china-cream dark:bg-gray-800 p-2 rounded-lg border border-china-gold/20">
+                        <span class="text-china-gray dark:text-gray-400 block text-[10px]">ทุน A1</span>
+                        <strong id="app1-cost-a1" class="text-china-red dark:text-china-gold text-sm">0.00</strong> บาท
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form 2: Selling Price & Profit Donut -->
+            <div class="mt-4 space-y-3 bg-white dark:bg-gray-700/50 p-4 rounded-xl border border-china-gold/30">
+                <h3 class="text-xs font-bold text-china-red dark:text-china-gold uppercase tracking-wider">2. คำนวณ % กำไรจากการขายจริง</h3>
+                <div>
+                    <label class="block text-xs font-medium dark:text-gray-200 mb-1">ราคาขายจริง (บาท)</label>
+                    <input type="number" id="app1-sell-price" placeholder="0.00" oninput="if(this.value<0)this.value=0; calcApp1()" class="w-full px-3 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:border-china-red">
+                </div>
+
+                <!-- Donut Chart Display -->
+                <div class="flex items-center justify-around pt-2">
+                    <div class="relative w-24 h-24 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-200 dark:text-gray-600" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="app1-donut-path" class="text-china-red transition-all duration-500" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="absolute text-center">
+                            <span id="app1-profit-pct" class="text-base font-extrabold text-china-dark dark:text-white">0.00%</span>
+                        </div>
+                    </div>
+                    <div class="text-xs space-y-1">
+                        <div><span class="text-china-gray dark:text-gray-400">กำไรสุทธิ:</span> <strong id="app1-profit-val" class="text-china-red dark:text-china-gold">0.00</strong> บาท</div>
+                        <div><span class="text-china-gray dark:text-gray-400">สถานะ:</span> <span id="app1-status" class="font-bold text-gray-500">-</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-2 mt-5">
+                <button onclick="clearApp1()" class="flex-1 bg-china-lightgold text-china-dark border border-china-gold/50 py-2.5 rounded-lg text-xs font-semibold hover:bg-[#f6e19c]">เคลียร์ข้อมูล</button>
+                <button onclick="saveHistoryApp1()" class="flex-1 bg-gradient-to-r from-china-darkred to-china-red text-white py-2.5 rounded-lg text-xs font-semibold shadow-glow hover:opacity-90">บันทึกประวัติ</button>
+            </div>
+
+            <!-- Capture Button -->
+            <div class="mt-2">
+                <button onclick="captureApp1()" class="w-full bg-amber-600 text-white py-2 rounded-lg text-xs font-semibold hover:bg-amber-700 transition-colors">📸 บันทึกเป็นรูป</button>
+            </div>
+
+            <!-- History App 1 -->
+            <div id="app1-history-section" class="mt-6 pt-4 border-t border-china-gold/30 hidden relative">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold text-china-red dark:text-china-gold">ประวัติการคำนวณต้นทุน</h3>
+                    <button onclick="clearAllHistoryApp1()" class="text-[10px] bg-red-50 dark:bg-red-900/30 text-red-500 border border-red-200 dark:border-red-800/50 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        ลบประวัติทั้งหมด
+                    </button>
+                </div>
+                <div id="app1-history-list" class="space-y-2"></div>
+            </div>
         </div>
 
-        <!-- Primary Action Buttons -->
-        <div class="flex gap-2 mt-5 pt-5 border-t border-china-gold/30 relative z-10">
-            <button class="flex-1 bg-china-lightgold text-china-dark border border-china-gold/50 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#f6e19c] transition-colors" onclick="clearAll()">เคลียร์ข้อมูล</button>
-            <button class="flex-1 bg-gradient-to-r from-china-darkred to-china-red text-white py-2.5 rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity" onclick="saveHistory()">บันทึกข้อมูล</button>
-        </div>
+        <!-- APP 2: หลงเปามิกซ์ Mix Margin -->
+        <div id="app2-section" class="bg-china-cream dark:bg-gray-800 p-5 sm:p-7 rounded-2xl shadow-2xl border border-china-gold/40 relative overflow-hidden transition-all hidden">
+            <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-china-gold rounded-tl-xl opacity-30 pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-china-gold rounded-tr-xl opacity-30 pointer-events-none"></div>
 
-        <!-- Results Section -->
-        <div class="mt-6 bg-white border-2 border-china-gold/30 rounded-xl p-5 shadow-sm relative overflow-hidden z-10">
-            <!-- Decorative subtle background -->
-            <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_center,_#a61b29_0%,_transparent_100%)] pointer-events-none"></div>
-
-            <div class="text-center text-[11px] font-bold text-china-gray uppercase tracking-wider mb-1">กำไรเฉลี่ยสุทธิ</div>
-            <div class="text-center text-4xl font-extrabold mb-3 text-china-red drop-shadow-sm" id="avg-result">0.00%</div>
+            <h3 class="text-xl sm:text-2xl font-bold text-center text-china-red dark:text-china-gold mb-6 flex items-center justify-center gap-2 tracking-wide">
+                <span>福</span> หลงเปา Mix Margin <span>禄</span>
+            </h3>
             
-            <div class="text-center text-[13px] text-china-gray mb-4 leading-relaxed bg-china-cream py-2 rounded-lg border border-china-gold/20">
-                ยอดรวมสุทธิ: <span class="font-bold text-china-dark text-[15px]" id="net-total-result">0.00</span> บาท<br>
-                กำไรสุทธิ: <span class="font-bold text-china-red text-[15px]" id="net-profit-result">0.00</span> บาท
+            <div class="item-grid text-[11px] font-semibold text-china-red/80 dark:text-china-gold mb-2 px-1 uppercase tracking-wider">
+                <div>สินค้า</div>
+                <div class="text-center">ชิ้น</div>
+                <div>ราคา/ชิ้น</div>
+                <div>GP</div>
+                <div></div>
             </div>
-            
-            <div class="text-[11px] font-bold uppercase tracking-wider text-china-gray mb-2 pb-1 border-b border-china-gold/30 flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                รายละเอียดกำไรแต่ละรายการ
+
+            <div id="item-list" class="flex flex-col gap-2 relative z-10">
+                <div class="item-grid row">
+                    <input type="text" placeholder="สินค้า 1" class="name w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="calcApp2()">
+                    <input type="number" min="0" placeholder="0" class="qty w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="if(this.value<0)this.value=0; calcApp2()">
+                    <input type="number" min="0" placeholder="0" class="price w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="if(this.value<0)this.value=0; calcApp2()">
+                    <div class="relative flex items-center">
+                        <input type="number" placeholder="0" class="profit w-full pl-2 pr-5 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="calcApp2()">
+                        <span class="absolute right-2 text-china-gray text-[10px] pointer-events-none">%</span>
+                    </div>
+                    <button class="w-[34px] h-[34px] flex items-center justify-center border border-china-gold/40 rounded-lg text-china-gray hover:bg-red-50 hover:text-china-red" onclick="removeRowApp2(this)" title="ลบแถว">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
+                    </button>
+                </div>
             </div>
-            <div id="breakdown-list" class="text-china-gray text-xs space-y-2">
-                <div class="py-2 text-center italic opacity-70">ยังไม่มีข้อมูลยอดขาย</div>
+
+            <div class="mt-3 relative z-10">
+                <button class="w-full sm:w-auto px-4 py-2 bg-transparent border border-china-gold text-china-red dark:text-china-gold font-medium rounded-lg text-xs hover:bg-china-lightgold/50 transition-colors flex items-center justify-center gap-1 mx-auto" onclick="addRowApp2()">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    เพิ่มสินค้า
+                </button>
+            </div>
+
+            <div class="mt-5 bg-china-lightgold/50 dark:bg-gray-700/50 p-4 border border-china-gold/40 rounded-xl relative z-10">
+                <label class="block text-xs font-semibold text-china-red dark:text-china-gold mb-2 uppercase tracking-wide">คูปองส่วนลด</label>
+                <select id="coupon-select" class="w-full px-3 py-2.5 border border-china-gold/50 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:border-china-red cursor-pointer shadow-sm transition-all" onchange="calcApp2()">
+                    <option value="0">ไม่ใช้คูปอง</option>
+                    <option value="25">คูปอง 1,000 ลด 25 บาท</option>
+                    <option value="55">คูปอง 2,000 ลด 55 บาท</option>
+                    <option value="150">คูปอง 5,000 ลด 150 บาท</option>
+                    <option value="320">คูปอง 9,000 ลด 320 บาท</option>
+                    <option value="800">คูปอง 20,000 ลด 800 บาท</option>
+                </select>
+            </div>
+
+            <div class="flex gap-2 mt-5 pt-5 border-t border-china-gold/30 relative z-10">
+                <button class="flex-1 bg-china-lightgold text-china-dark border border-china-gold/50 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#f6e19c]" onclick="clearAllApp2()">เคลียร์ข้อมูล</button>
+                <button class="flex-1 bg-gradient-to-r from-china-darkred to-china-red text-white py-2.5 rounded-lg text-sm font-semibold shadow-glow hover:opacity-90" onclick="saveHistoryApp2()">บันทึกข้อมูล</button>
+            </div>
+
+            <!-- Results Section App 2 -->
+            <div class="mt-6 bg-white dark:bg-gray-700 border-2 border-china-gold/30 rounded-xl p-5 shadow-sm relative overflow-hidden z-10">
+                <div class="text-center text-[11px] font-bold text-china-gray dark:text-gray-300 uppercase tracking-wider mb-1">กำไรเฉลี่ยสุทธิ</div>
+                <div class="text-center text-4xl font-extrabold mb-3 text-china-red dark:text-china-gold drop-shadow-sm" id="avg-result">0.00%</div>
+                
+                <div class="text-center text-[13px] text-china-gray dark:text-gray-300 mb-4 leading-relaxed bg-china-cream dark:bg-gray-800 py-2 rounded-lg border border-china-gold/20">
+                    ยอดรวมสุทธิ: <span class="font-bold text-china-dark dark:text-white text-[15px]" id="net-total-result">0.00</span> บาท<br>
+                    กำไรสุทธิ: <span class="font-bold text-china-red dark:text-china-gold text-[15px]" id="net-profit-result">0.00</span> บาท
+                </div>
+                
+                <div class="text-[11px] font-bold uppercase tracking-wider text-china-gray dark:text-gray-300 mb-2 pb-1 border-b border-china-gold/30 flex items-center gap-1">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    รายละเอียดกำไรแต่ละรายการ
+                </div>
+                <div id="breakdown-list" class="text-china-gray text-xs space-y-2">
+                    <div class="py-2 text-center italic opacity-70">ยังไม่มีข้อมูลยอดขาย</div>
+                </div>
+            </div>
+
+            <!-- History App 2 -->
+            <div id="history-section" class="mt-6 pt-5 border-t-2 border-dashed border-china-gold/40 relative z-10 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="text-sm font-bold text-china-red dark:text-china-gold flex items-center gap-2">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        ประวัติ Mix Margin
+                    </div>
+                    <button onclick="clearAllHistoryApp2()" class="text-[10px] bg-red-50 dark:bg-red-900/30 text-red-500 border border-red-200 dark:border-red-800/50 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        ลบประวัติทั้งหมด
+                    </button>
+                </div>
+                <div id="history-list" class="space-y-3"></div>
             </div>
         </div>
 
-        <!-- History Section -->
-        <div id="history-section" class="mt-6 pt-5 border-t-2 border-dashed border-china-gold/40 relative z-10" style="display: none;">
-            <div class="text-sm font-bold mb-4 text-china-red flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                ประวัติการบันทึก
-            </div>
-            <div id="history-list" class="space-y-3"></div>
-        </div>
     </div>
 
     <script>
-        let lastCalculation = null;
+        // Global Navigation & UI
+        function switchApp(appId) {
+            const app1Sec = document.getElementById('app1-section');
+            const app2Sec = document.getElementById('app2-section');
+            const nav1 = document.getElementById('nav-app1');
+            const nav2 = document.getElementById('nav-app2');
 
-        // Custom Toast Notification System
+            if (appId === 'app1') {
+                app1Sec.classList.remove('hidden');
+                app2Sec.classList.add('hidden');
+                nav1.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 bg-gradient-to-r from-china-darkred to-china-red text-white shadow-md';
+                nav2.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 text-china-dark dark:text-china-lightgold hover:bg-china-lightgold/50';
+            } else {
+                app1Sec.classList.add('hidden');
+                app2Sec.classList.remove('hidden');
+                nav2.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 bg-gradient-to-r from-china-darkred to-china-red text-white shadow-md';
+                nav1.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 text-china-dark dark:text-china-lightgold hover:bg-china-lightgold/50';
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
         function showToast(message, isError = false) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
             const bgClass = isError ? 'bg-red-600' : 'bg-green-600';
-            const icon = isError 
-                ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
-                : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            const icon = isError ? '⚠️' : '✅';
 
             toast.className = `toast-enter flex items-center gap-2 px-4 py-3 text-white text-sm font-medium rounded-lg shadow-lg ${bgClass}`;
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
             container.appendChild(toast);
 
             setTimeout(() => {
@@ -267,28 +318,141 @@
             }, 3000);
         }
 
-        function addRow() {
+        // ================= APP 1 LOGIC =================
+        let app1CalculatedData = null;
+
+        function calcApp1() {
+            const decPrice = parseFloat(document.getElementById('app1-declared-price').value) || 0;
+            const gpPct = parseFloat(document.getElementById('app1-gp-pct').value) || 0;
+            const sellPrice = parseFloat(document.getElementById('app1-sell-price').value) || 0;
+
+            const costVat = decPrice * (1 - (gpPct / 100));
+            const costA1 = costVat / 1.07;
+
+            document.getElementById('app1-cost-vat').innerText = costVat.toFixed(2);
+            document.getElementById('app1-cost-a1').innerText = costA1.toFixed(2);
+
+            let profitVal = 0;
+            let profitPct = 0;
+
+            if (sellPrice > 0) {
+                profitVal = sellPrice - costVat;
+                profitPct = (profitVal / sellPrice) * 100;
+            }
+
+            const profitValEl = document.getElementById('app1-profit-val');
+            profitValEl.innerText = profitVal.toFixed(2);
+            document.getElementById('app1-profit-pct').innerText = `${profitPct.toFixed(2)}%`;
+
+            if (profitVal < 0) {
+                profitValEl.className = "text-red-600 dark:text-red-400 font-bold";
+            } else {
+                profitValEl.className = "text-china-red dark:text-china-gold";
+            }
+
+            // Donut animation & color logic
+            const donutPath = document.getElementById('app1-donut-path');
+            const statusEl = document.getElementById('app1-status');
+            const clampedPct = Math.min(Math.max(profitPct, 0), 100);
+            donutPath.setAttribute('stroke-dasharray', `${clampedPct}, 100`);
+
+            if (profitPct >= 1) {
+                donutPath.setAttribute('class', 'text-green-500 transition-all duration-500');
+                statusEl.innerText = 'กำไรดี (≥1%)';
+                statusEl.className = 'font-bold text-green-600 dark:text-green-400';
+            } else if (profitPct >= 0) {
+                donutPath.setAttribute('class', 'text-amber-500 transition-all duration-500');
+                statusEl.innerText = 'กำไรต่ำ (0-0.99%)';
+                statusEl.className = 'font-bold text-amber-600 dark:text-amber-400';
+            } else {
+                donutPath.setAttribute('class', 'text-red-600 transition-all duration-500');
+                statusEl.innerText = 'ขาดทุน (<0%)';
+                statusEl.className = 'font-bold text-red-600 dark:text-red-400';
+            }
+
+            app1CalculatedData = {
+                name: document.getElementById('app1-name').value || 'ชื่อสินค้าที่อยากคำนวณ',
+                decPrice, gpPct, costVat, costA1, sellPrice, profitVal, profitPct
+            };
+        }
+
+        function clearApp1() {
+            document.getElementById('app1-name').value = '';
+            document.getElementById('app1-declared-price').value = '';
+            document.getElementById('app1-gp-pct').value = '';
+            document.getElementById('app1-sell-price').value = '';
+            calcApp1();
+            showToast('เคลียร์ข้อมูลต้นทุนเรียบร้อย');
+        }
+
+        function saveHistoryApp1() {
+            if (!app1CalculatedData || app1CalculatedData.decPrice === 0) {
+                showToast('กรุณากรอกราคาประกาศก่อนบันทึก', true);
+                return;
+            }
+
+            const sec = document.getElementById('app1-history-section');
+            const list = document.getElementById('app1-history-list');
+            sec.classList.remove('hidden');
+
+            const isNeg = app1CalculatedData.profitPct < 0;
+            const pctColor = isNeg ? 'text-red-600 dark:text-red-400' : 'text-china-red dark:text-china-gold';
+
+            const item = document.createElement('div');
+            item.className = 'history-card bg-white dark:bg-gray-700 p-3 rounded-lg border border-china-gold/30 text-xs flex justify-between items-center relative';
+            item.innerHTML = `
+                <div class="pr-6">
+                    <strong class="text-china-dark dark:text-white">${app1CalculatedData.name}</strong>
+                    <div class="text-[10px] text-china-gray dark:text-gray-300">
+                        ทุน+Vat: ${app1CalculatedData.costVat.toFixed(2)} | ทุน A1: ${app1CalculatedData.costA1.toFixed(2)}
+                    </div>
+                </div>
+                <div class="text-right pr-6">
+                    <span class="font-extrabold ${pctColor} block">${app1CalculatedData.profitPct.toFixed(2)}%</span>
+                </div>
+                <button onclick="this.closest('.history-card').remove(); if(document.getElementById('app1-history-list').children.length === 0) document.getElementById('app1-history-section').classList.add('hidden');" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-300 hover:text-red-500 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="ลบรายการนี้">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            `;
+            list.prepend(item);
+            showToast('บันทึกประวัติสำเร็จ');
+        }
+
+        function clearAllHistoryApp1() {
+            document.getElementById('app1-history-list').innerHTML = '';
+            document.getElementById('app1-history-section').classList.add('hidden');
+            showToast('ลบประวัติคำนวณต้นทุนทั้งหมดแล้ว');
+        }
+
+        function captureApp1() {
+            html2canvas(document.getElementById('app1-section')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `LongBao_Cost_${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                showToast('บันทึกรูปภาพเรียบร้อย');
+            });
+        }
+
+        // ================= APP 2 LOGIC =================
+        let lastCalculation = null;
+
+        function addRowApp2() {
             const list = document.getElementById('item-list');
             const count = list.children.length + 1;
             const row = document.createElement('div');
             row.className = 'item-grid row opacity-0 transform -translate-y-2 transition-all duration-300';
             
             row.innerHTML = `
+                <input type="text" placeholder="สินค้า ${count}" class="name w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="calcApp2()">
+                <input type="number" min="0" placeholder="0" class="qty w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="if(this.value<0)this.value=0; calcApp2()">
+                <input type="number" min="0" placeholder="0" class="price w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="if(this.value<0)this.value=0; calcApp2()">
                 <div class="relative flex items-center">
-                    <input type="text" placeholder="สินค้า ${count}" class="name w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="qty w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="if(this.value<0)this.value=0; calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="price w-full px-2 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="if(this.value<0)this.value=0; calc()">
-                </div>
-                <div class="relative flex items-center">
-                    <input type="number" placeholder="0" class="profit w-full pl-2 pr-5 py-2 border border-china-gold/40 rounded-lg text-xs bg-white text-china-dark focus:outline-none focus:border-china-red focus:ring-1 focus:ring-china-red transition-all" oninput="calc()">
+                    <input type="number" placeholder="0" class="profit w-full pl-2 pr-5 py-2 border border-china-gold/40 rounded-lg text-xs bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:border-china-red" oninput="calcApp2()">
                     <span class="absolute right-2 text-china-gray text-[10px] pointer-events-none">%</span>
                 </div>
-                <button class="w-[34px] h-[34px] flex items-center justify-center bg-transparent border border-china-gold/40 rounded-lg text-china-gray hover:bg-red-50 hover:text-china-red hover:border-china-red transition-all" onclick="removeRow(this)" title="ลบแถว">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
+                <button class="w-[34px] h-[34px] flex items-center justify-center border border-china-gold/40 rounded-lg text-china-gray hover:bg-red-50 hover:text-china-red" onclick="removeRowApp2(this)" title="ลบแถว">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
                 </button>
             `;
             list.appendChild(row);
@@ -296,254 +460,198 @@
             requestAnimationFrame(() => {
                 row.classList.remove('opacity-0', '-translate-y-2');
             });
-            calc();
         }
 
-        function removeRow(button) {
-            const row = button.parentElement;
-            if (document.querySelectorAll('.row').length > 1) {
-                row.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => {
-                    row.remove();
-                    calc();
-                }, 200);
-            } else {
-                showToast('ต้องมีรายการสินค้าอย่างน้อย 1 รายการครับ', true);
-            }
+        function removeRowApp2(btn) {
+            const row = btn.closest('.row');
+            row.classList.add('opacity-0', '-translate-y-2');
+            setTimeout(() => {
+                row.remove();
+                calcApp2();
+            }, 300);
         }
 
-        function clearAll() {
-            document.querySelectorAll('.row').forEach(row => {
-                row.querySelector('.name').value = '';
-                row.querySelector('.qty').value = '';
-                row.querySelector('.price').value = '';
-                row.querySelector('.profit').value = '';
-            });
-            document.getElementById('coupon-select').value = "0";
-            calc();
-            showToast('เคลียร์ข้อมูลเรียบร้อยแล้ว');
-        }
+        function calcApp2() {
+            const rows = document.querySelectorAll('#item-list .row');
+            let totalSalesBeforeCoupon = 0;
+            let items = [];
 
-        function calc() {
-            const rows = document.querySelectorAll('.row');
-            let totalVal = 0;
-            let totalProfVal = 0;
-            const rawItems = [];
+            rows.forEach((row, index) => {
+                const name = row.querySelector('.name').value || `สินค้า ${index + 1}`;
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                const gp = parseFloat(row.querySelector('.profit').value) || 0;
 
-            rows.forEach((row, i) => {
-                const nameInput = row.querySelector('.name').value.trim();
-                const name = nameInput || `สินค้า ${i + 1}`;
-                const qty = Math.max(0, parseFloat(row.querySelector('.qty').value) || 0);
-                const price = Math.max(0, parseFloat(row.querySelector('.price').value) || 0);
-                const profPct = parseFloat(row.querySelector('.profit').value) || 0;
+                const sales = qty * price;
+                const profitBaht = sales * (gp / 100);
 
-                const val = qty * price;
-
-                if (val > 0) {
-                    const profVal = val * (profPct / 100);
-                    totalVal += val;
-                    totalProfVal += profVal;
-                    rawItems.push({ name, qty, price, val, profPct, profVal });
+                if (qty > 0 && price > 0) {
+                    totalSalesBeforeCoupon += sales;
+                    items.push({ name, qty, price, gp, sales, profitBaht });
                 }
             });
 
-            const breakdown = rawItems.map(item => {
-                const sharePct = totalVal > 0 ? (item.val / totalVal) * 100 : 0;
-                return { ...item, sharePct };
-            });
+            const couponVal = parseFloat(document.getElementById('coupon-select').value) || 0;
+            
+            let netTotalSales = totalSalesBeforeCoupon - couponVal;
+            if (netTotalSales < 0) netTotalSales = 0;
 
-            const couponSelect = document.getElementById('coupon-select');
-            const discountAmount = parseFloat(couponSelect.value) || 0;
-            const couponText = couponSelect.options[couponSelect.selectedIndex].text;
+            let totalProfitBeforeCoupon = items.reduce((sum, item) => sum + item.profitBaht, 0);
+            let netProfit = totalProfitBeforeCoupon - couponVal;
+            let avgGpPct = netTotalSales > 0 ? (netProfit / netTotalSales) * 100 : 0;
+
+            document.getElementById('avg-result').innerText = `${avgGpPct.toFixed(2)}%`;
             
-            const netTotalVal = Math.max(0, totalVal - discountAmount);
-            const netProfVal = totalProfVal - discountAmount;
-            const avgPct = totalVal > 0 ? (netProfVal / totalVal) * 100 : 0;
-            
-            const avgElement = document.getElementById('avg-result');
-            avgElement.innerText = `${avgPct.toFixed(2)}%`;
-            
-            if(avgPct < 0) {
-                avgElement.className = "text-center text-4xl font-extrabold mb-3 text-red-600 drop-shadow-sm";
+            const netProfitEl = document.getElementById('net-profit-result');
+            netProfitEl.innerText = netProfit.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if (netProfit < 0) {
+                netProfitEl.className = "font-bold text-red-600 dark:text-red-400 text-[15px]";
             } else {
-                avgElement.className = "text-center text-4xl font-extrabold mb-3 text-china-red drop-shadow-sm";
+                netProfitEl.className = "font-bold text-china-red dark:text-china-gold text-[15px]";
             }
 
-            document.getElementById('net-total-result').innerText = netTotalVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('net-profit-result').innerText = netProfVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
-            const bList = document.getElementById('breakdown-list');
-            bList.innerHTML = '';
-            
-            if (breakdown.length === 0 && totalVal === 0) {
-                bList.innerHTML = '<div class="py-2 text-center italic opacity-70">ยังไม่มีข้อมูลยอดขาย</div>';
+            document.getElementById('net-total-result').innerText = netTotalSales.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            const breakdownList = document.getElementById('breakdown-list');
+            if (items.length === 0) {
+                breakdownList.innerHTML = '<div class="py-2 text-center italic opacity-70">ยังไม่มีข้อมูลยอดขาย</div>';
+                lastCalculation = null;
             } else {
-                breakdown.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center text-[13px] bg-gray-50 rounded p-2 border border-gray-100';
-                    div.innerHTML = `
-                        <div>
-                            <strong class="text-china-dark">${item.name}</strong> 
-                            <span class="text-china-red font-semibold ml-1">(${item.sharePct.toFixed(1)}%)</span>
-                            <div class="text-[11px] text-china-gray mt-0.5">
-                                ${item.qty} ชิ้น x ${item.price.toLocaleString('th-TH')} บ. | GP ${item.profPct}%
+                let html = '';
+                items.forEach(item => {
+                    const proportion = totalSalesBeforeCoupon > 0 ? (item.sales / totalSalesBeforeCoupon) * 100 : 0;
+                    item.proportion = proportion; 
+
+                    const isNeg = item.profitBaht < 0;
+                    const profitColor = isNeg ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
+                    const profitSign = isNeg ? '' : '+';
+                    const gpColor = item.gp < 0 ? 'text-red-600 dark:text-red-400' : 'text-china-red dark:text-china-gold';
+
+                    html += `
+                        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-2 rounded border border-china-gold/20">
+                            <div class="flex-1">
+                                <div class="font-bold text-china-dark dark:text-white">${item.name} <span class="text-[10px] text-china-red dark:text-china-gold bg-china-lightgold/30 px-1.5 py-0.5 rounded ml-1">สัดส่วน ${proportion.toFixed(1)}%</span></div>
+                                <div class="text-[10px] text-china-gray dark:text-gray-400 mt-0.5">จำนวน ${item.qty} x ${item.price} บ. = ยอดขาย ${item.sales.toLocaleString()} บ.</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold ${gpColor}">GP ${item.gp}%</div>
+                                <div class="text-[10px] ${profitColor} font-bold">${profitSign}${item.profitBaht.toLocaleString('th-TH', {minimumFractionDigits: 2})} บ.</div>
                             </div>
                         </div>
-                        <div class="text-right font-medium text-china-dark">
-                            ${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.
+                    `;
+                });
+                
+                if(couponVal > 0) {
+                    html += `
+                        <div class="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800/30 mt-2">
+                            <div class="text-red-600 dark:text-red-400 font-bold text-xs">หักคูปองส่วนลด</div>
+                            <div class="text-red-600 dark:text-red-400 font-bold text-xs">-${couponVal} บ.</div>
                         </div>
                     `;
-                    bList.appendChild(div);
-                });
-
-                if (discountAmount > 0) {
-                    const discDiv = document.createElement('div');
-                    discDiv.className = 'flex justify-between items-center text-[13px] mt-2 pt-2 border-t border-dashed border-red-200 text-red-600 font-medium px-2';
-                    discDiv.innerHTML = `
-                        <div>ส่วนลด (${couponText})</div>
-                        <div>-${discountAmount.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.</div>
-                    `;
-                    bList.appendChild(discDiv);
                 }
+                
+                breakdownList.innerHTML = html;
+
+                lastCalculation = {
+                    items,
+                    totalSalesBeforeCoupon,
+                    netTotalSales,
+                    totalProfitBeforeCoupon,
+                    netProfit,
+                    avgGpPct,
+                    couponVal,
+                    time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
+                };
             }
-
-            lastCalculation = {
-                avgPct: avgPct.toFixed(2),
-                totalVal,
-                netTotalVal,
-                totalProfVal,
-                discountAmount,
-                netProfVal,
-                couponText,
-                breakdown,
-                time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
-            };
         }
 
-        function showStickerEffect() {
-            const emojis = ['🏮', '🧧','💰', '✨', '🐉', '🐲', '🤑'];
-            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-
-            const sticker = document.createElement('div');
-            sticker.className = 'sticker-popup';
-            sticker.innerText = randomEmoji;
-
-            document.body.appendChild(sticker);
-
-            setTimeout(() => {
-                sticker.remove();
-            }, 1200);
-        }
-
-        function saveHistory() {
-            if (!lastCalculation || lastCalculation.totalVal === 0) {
-                showToast('กรุณากรอกข้อมูลจำนวนและราคาสินค้าก่อนบันทึกครับ', true);
+        function saveHistoryApp2() {
+            if (!lastCalculation || lastCalculation.items.length === 0) {
+                showToast('กรุณากรอกข้อมูลสินค้าและราคาก่อนบันทึก', true);
                 return;
             }
 
-            const hSection = document.getElementById('history-section');
-            const hList = document.getElementById('history-list');
-            hSection.style.display = 'block';
+            const sec = document.getElementById('history-section');
+            const list = document.getElementById('history-list');
+            sec.classList.remove('hidden');
 
-            let itemsHtml = `
-                <div class="grid grid-cols-[2fr_2.2fr_1.5fr] font-semibold text-[11px] text-china-red/80 mb-2 pb-1.5 border-b border-china-gold/30">
-                    <div>สินค้า (สัดส่วน)</div>
-                    <div class="text-right">จำนวน × ราคา = ยอดขาย</div>
-                    <div class="text-right">กำไร (GP)</div>
-                </div>
-            `;
+            let itemsHtml = lastCalculation.items.map(item => {
+                const isItemNeg = item.profitBaht < 0;
+                const itemColorClass = isItemNeg ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
+                const itemSign = isItemNeg ? '' : '+';
+                const gpColor = item.gp < 0 ? 'text-red-600 dark:text-red-400' : 'text-china-red dark:text-china-gold';
 
-            lastCalculation.breakdown.forEach(item => {
-                itemsHtml += `
-                    <div class="grid grid-cols-[2fr_2.2fr_1.5fr] text-[11px] mb-2 pb-2 border-b border-dashed border-china-gold/20 last:border-0 last:mb-0 last:pb-0 items-center">
-                        <div class="pr-1">
-                            <div class="font-medium text-china-dark truncate" title="${item.name}">${item.name}</div>
-                            <div class="text-china-red text-[10px] font-semibold mt-0.5">สัดส่วน ${item.sharePct.toFixed(1)}%</div>
+                return `
+                    <div class="mb-2 border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="font-bold text-xs text-china-dark dark:text-white">
+                                ${item.name} 
+                                <span class="text-[10px] text-china-red dark:text-china-gold ml-1 font-extrabold bg-china-lightgold/30 px-1 rounded">(สัดส่วน ${item.proportion.toFixed(1)}%)</span>
+                            </div>
+                            <div class="text-xs font-bold ${gpColor}">GP ${item.gp}%</div>
                         </div>
-                        <div class="text-right leading-tight pr-1">
-                            <div class="text-china-gray text-[10px]">${item.qty} ชิ้น × ${item.price.toLocaleString('th-TH')} บ.</div>
-                            <div class="font-medium text-china-dark mt-0.5">= ${item.val.toLocaleString('th-TH')}</div>
-                        </div>
-                        <div class="text-right leading-tight">
-                            <div class="font-medium">${item.profPct}%</div>
-                            <div class="text-china-gray text-[10px] mt-0.5">(${item.profVal.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} บ.)</div>
+                        <div class="text-[10px] text-china-gray dark:text-gray-400 flex justify-between bg-gray-50 dark:bg-gray-800/50 p-1 rounded items-center">
+                            <span>จำนวน: ${item.qty} | ราคา: ${item.price}฿ | ยอดขาย: ${item.sales.toLocaleString()}฿</span>
+                            <span class="font-bold ${itemColorClass} text-xs">กำไร ${itemSign}${item.profitBaht.toLocaleString('th-TH', {minimumFractionDigits: 2})} ฿</span>
                         </div>
                     </div>
                 `;
-            });
+            }).join('');
 
-            let couponHtml = '';
-            if (lastCalculation.discountAmount > 0) {
-                couponHtml = `
-                    <div class="flex justify-between text-[11px] text-red-600 mt-2 pt-2 border-t border-dashed border-china-gold/30">
-                        <span>${lastCalculation.couponText}</span>
-                        <span class="font-medium">-${lastCalculation.discountAmount.toLocaleString('th-TH')} บ.</span>
-                    </div>
-                `;
-            }
+            const isNetNeg = lastCalculation.netProfit < 0;
+            const netProfitColor = isNetNeg ? 'text-red-600 dark:text-red-400 font-extrabold text-sm' : 'text-green-600 font-extrabold text-sm';
+            const netProfitSign = isNetNeg ? '' : '+';
 
-            const card = document.createElement('div');
-            card.className = 'bg-[#fef9eb] p-4 rounded-xl border border-china-gold shadow-sm text-xs relative overflow-hidden transition-all hover:shadow-md';
+            const itemCard = document.createElement('div');
+            itemCard.className = 'history-card bg-white dark:bg-gray-800 p-3 rounded-lg border border-china-gold/40 shadow-sm relative overflow-hidden';
             
-            card.innerHTML = `
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-china-gold"></div>
-                <div class="flex justify-between items-center mb-3">
-                    <span class="font-bold text-china-dark bg-china-gold/20 px-2 py-0.5 rounded text-[11px]">บันทึกเมื่อ: ${lastCalculation.time}</span>
-                    <button class="w-6 h-6 flex items-center justify-center text-china-gray hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" onclick="deleteHistory(this)" title="ลบประวัตินี้">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+            itemCard.innerHTML = `
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-china-darkred to-china-red"></div>
+                
+                <button onclick="this.closest('.history-card').remove(); if(document.getElementById('history-list').children.length === 0) document.getElementById('history-section').classList.add('hidden'); showToast('ลบรายการประวัติแล้ว');" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 z-10 p-1 bg-white dark:bg-gray-800 rounded-full hover:bg-red-50 transition-colors shadow-sm" title="ลบรายการนี้">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+                
+                <div class="pl-2 mb-3 pr-6">
+                    ${itemsHtml}
                 </div>
                 
-                <div class="bg-white p-3 rounded-lg border border-china-gold/20 mb-3">
-                    ${itemsHtml}
-                    ${couponHtml}
-                </div>
+                ${lastCalculation.couponVal > 0 ? `
+                <div class="pl-2 flex justify-between items-center text-xs text-red-500 mb-3 border-t border-dashed border-gray-200 dark:border-gray-600 pt-2 font-semibold pr-1">
+                    <span>คูปองส่วนลดที่ใช้</span>
+                    <span>-${lastCalculation.couponVal} ฿</span>
+                </div>` : ''}
 
-                <div class="flex justify-between items-end text-xs border-t border-dashed border-china-gold/40 pt-3">
-                    <div class="text-china-dark space-y-1">
-                        <div><span class="text-china-gray">ยอดรวมสุทธิ:</span> <strong class="text-sm">${lastCalculation.netTotalVal.toLocaleString('th-TH', {maximumFractionDigits: 2})}</strong> บ.</div>
-                        <div><span class="text-china-gray">กำไรสุทธิ:</span> <strong class="text-sm text-china-red">${lastCalculation.netProfVal.toLocaleString('th-TH', {maximumFractionDigits: 2})}</strong> บ.</div>
+                <div class="bg-china-cream dark:bg-gray-900 p-2.5 rounded-lg flex justify-between items-center ml-2 border border-china-gold/30">
+                    <div>
+                        <div class="text-[11px] text-china-gray mb-0.5">ยอดรวมสุทธิ: <span class="font-bold text-china-dark dark:text-white text-sm">${lastCalculation.netTotalSales.toLocaleString('th-TH', {minimumFractionDigits: 2})}</span> ฿</div>
+                        <div class="text-[11px] text-china-gray">% GP สุทธิ: <span class="font-bold text-china-red dark:text-china-gold text-sm">${lastCalculation.avgGpPct.toFixed(2)}%</span></div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-china-gray text-[10px] font-bold tracking-wide uppercase mb-0.5">กำไรเฉลี่ย</div>
-                        <div class="text-xl font-extrabold text-china-red">
-                            ${lastCalculation.avgPct}%
-                        </div>
+                    <div class="text-right flex flex-col justify-center items-end">
+                        <span class="block ${netProfitColor}">กำไร ${netProfitSign}${lastCalculation.netProfit.toLocaleString('th-TH', {minimumFractionDigits: 2})} ฿</span>
+                        <span class="text-[9px] text-gray-400 mt-1">${lastCalculation.time}</span>
                     </div>
                 </div>
             `;
             
-            hList.prepend(card);
-            showStickerEffect();
-            showToast('บันทึกข้อมูลสำเร็จ!');
+            list.prepend(itemCard);
+            showToast('บันทึกประวัติ Mix Margin เรียบร้อย');
         }
 
-        function deleteHistory(btn) {
-            const card = btn.closest('.bg-\\[\\#fef9eb\\]');
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.95)';
-            
-            setTimeout(() => {
-                card.remove();
-                const hList = document.getElementById('history-list');
-                if (hList.children.length === 0) {
-                    document.getElementById('history-section').style.display = 'none';
-                }
-            }, 200);
+        function clearAllHistoryApp2() {
+            document.getElementById('history-list').innerHTML = '';
+            document.getElementById('history-section').classList.add('hidden');
+            showToast('ลบประวัติ Mix Margin ทั้งหมดแล้ว');
         }
 
-        // ลงทะเบียน Service Worker เบื้องต้นสำหรับ PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(() => {
-                    // ป้องกัน Error กรณีไม่ได้สร้างไฟล์ sw.js ไว้ (สามารถปล่อยผ่านได้)
-                });
-            });
+        function clearAllApp2() {
+            const list = document.getElementById('item-list');
+            list.innerHTML = '';
+            document.getElementById('coupon-select').value = "0";
+            addRowApp2();
+            calcApp2();
+            showToast('ล้างข้อมูล Mix Margin เรียบร้อย');
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            calc();
-        });
     </script>
 </body>
 </html>
